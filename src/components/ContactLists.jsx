@@ -1,34 +1,25 @@
 import { useState, useEffect } from "react";
 import ContactRow from "./ContactRow";
+const BASEURL = "http://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/";
+const GET = "users";
 
-const BASEURL = "https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/";
-const GET = "users"
+export default function ContactList({selectedContactId, setSelectedContactId}) {
+  const [contacts, setContacts] = useState([]);
 
-const dummyContacts = [
-  { id: 1, name: "R2-D2", phone: "222-222-2222", email: "r2d2@droids.com" },
-  { id: 2, name: "C-3PO", phone: "333-333-3333", email: "c3po@droids.com" },
-  { id: 3, name: "BB-8", phone: "888-888-8888", email: "bb8@droids.com" },
-];
+  useEffect(() => {
+    async function fetchContacts() {
+      try {
+        const res = await fetch(`${BASEURL}${GET}`);
+        const json = await res.json();
+        setContacts(json);
+      } catch (err) {
+        console.error("fetchContacts Failed to Fetch", err);
+      }
+    }
+    return () => fetchContacts();
+  }, []);
 
-export default function ContactList() {
-
-  const [contacts, setContacts] = useState(dummyContacts);
   console.log(contacts);
-
-    useEffect (() => {
-        async function fetchContacts() {
-            try {
-                const res = await fetch(`${BASEURL}${GET}`);
-                const json = await res.json();
-                setContacts(json)
-            }
-            catch (err) {
-                console.error("fetchContacts Failed to Fetch", err);
-            }
-        }
-        return () => fetchContacts();
-    }, []);
-    
 
   return (
     <table>
@@ -39,14 +30,17 @@ export default function ContactList() {
       </thead>
       <tbody>
         <tr>
-          <td>Name</td>
-          <td>Email</td>
-          <td>Phone</td>
+          <th className='th1'>Name</th>
+          <th className='th2'>Email</th>
+          <th className='th3'>Phone</th>
         </tr>
-        {/* INSERT (BELOW) - STATE.map function with Component and required Props */}
         {contacts.map((contact) => {
-          return <ContactRow key={contact.id} contact={contact} />;
-        })}
+          return <ContactRow key={contact.id}
+                    contact={contact}
+                    setSelectedContactId={setSelectedContactId}
+                />;
+          })
+        }
       </tbody>
     </table>
   );
